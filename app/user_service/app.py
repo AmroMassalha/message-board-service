@@ -236,13 +236,13 @@ class UserServiceApplication:
                 return jsonify({"msg": "Missing password parameter"}), 400
     
             user = self.user_service_logic.get_user_by_username(username)
-            logging.error(user['id'])
             if not user:
                 return jsonify({"msg": "User not found"}), 404
     
             hashed_password = generate_password_hash(str(password), method='sha256')
     
             self.user_service_logic.edit_user(user['id'], username, hashed_password)
+            #TODO: the register requist will replace the unhashed password with the hashed one which mean need to fix the update so can stor both formats in the same user set
             return jsonify({"msg": "User registered successfully"}), 200
         except Exception as e:
             logging.error(f"Error registering user: {e}")
@@ -291,7 +291,6 @@ class UserServiceApplication:
                 return jsonify({"msg": "Missing password parameter"}), 400
     
             user = self.user_service_logic.get_user_by_username(username)
-            logging.error(user)
             if user and len(user) > 0 and check_password_hash(user['password'], str(password)):
                 access_token = create_access_token(identity=username)
                 return jsonify(access_token=access_token), 200
