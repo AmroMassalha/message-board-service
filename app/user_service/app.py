@@ -31,7 +31,6 @@ class UserServiceApplication:
         self.app.add_url_rule('/login', 'login', self.login, methods=['POST'])
         self.app.add_url_rule('/logout', 'logout', self.logout, methods=['POST'])
 
-        # Setup flasgger
         self.swagger = Swagger(self.app)
 
     def run(self, host='0.0.0.0', port=5000):
@@ -215,34 +214,38 @@ class UserServiceApplication:
                         type: string
                         description: The user's password
         responses:
-            201:
+            200:
                 description: User registered successfully
             400:
                 description: Missing username or password parameter
+            404:
+                description: User not found
             500:
                 description: Error occurred while registering user
         """
         try:
             if not request.is_json:
                 return jsonify({"msg": "Missing JSON in request"}), 400
-
+    
             username = request.json.get('username', None)
             password = request.json.get('password', None)
-
+    
             if not username:
                 return jsonify({"msg": "Missing username parameter"}), 400
             if not password:
                 return jsonify({"msg": "Missing password parameter"}), 400
-
-            if self.user_service_logic.get_user_by_username(username):
-                return jsonify({"msg": "User already exists"}), 400
-
+    
+            user = self.user_service_logic.get_user_by_username(username)
+            if not user:
+                return jsonify({"msg": "User not found"}), 404
+    
             hashed_password = generate_password_hash(str(password), method='sha256')
-
-            self.user_service_logic.create_user(username, hashed_password)
-            return jsonify({"msg": "User created successfully"}), 201
+    
+            self.user_service_logic.edit_user(user['id'], username, hashed_password)
+            #TODO: the register requist will replace the unhashed password with the hashed one which mean need to fix the update so can stor both formats in the same user set
+            return jsonify({"msg": "User registered successfully"}), 200
         except Exception as e:
-            logging.error(f"Error creating user: {e}")
+            logging.error(f"Error registering user: {e}")
             abort(500)
 
     def login(self):

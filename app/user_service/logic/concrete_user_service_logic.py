@@ -77,7 +77,7 @@ class ConcreteUserServiceLogic(UserServiceLogic):
         try:
             result = self.db_client.execute_query(self.database, query, *args)
             if result:
-                return {"username": result[0][1], "password": result[0][2]}
+                return {"id": result[0][0] ,"username": result[0][1], "password": result[0][2]}
             else:
                 return None
         except Exception as e:
