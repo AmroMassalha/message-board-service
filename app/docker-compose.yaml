@@ -22,6 +22,31 @@ services:
       timeout: 10s
       retries: 3
 
+  message-service:
+    depends_on:
+      - user-service
+      - database
+    container_name: message-service
+    build:
+      context: .
+      dockerfile: message_service/Dockerfile
+    ports:
+      - 5002:5000
+    environment:
+      PYTHONDONTWRITEBYTECODE: ${PYTHONDONTWRITEBYTECODE}
+      PYTHONUNBUFFERED: ${PYTHONUNBUFFERED}
+      PYTHONPATH: ${PYTHONPATH}
+      ENV: ${ENV}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      local_app_network:
+        aliases:
+          - http://message-board.message-service.com/
+
   user-service:
     depends_on:
       - database
@@ -44,7 +69,7 @@ services:
     networks:
       local_app_network:
         aliases:
-          - http://user-service.com/
+          - http://message-board.user-service.com/
 
 networks:
   local_app_network:

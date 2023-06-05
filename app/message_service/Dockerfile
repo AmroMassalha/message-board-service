@@ -13,14 +13,14 @@ COPY ../foundations/ ./foundations/
 # Stage 2: Build stage
 FROM base AS builder
 
-COPY ../user_service/ ./user_service/
+COPY ../message_service/ ./message_service/
 
 # Stage 3: Final image
 FROM base
 
 COPY --from=builder /app /app
 
-WORKDIR /app/user_service
+WORKDIR /app/message_service
 
 ENV PYTHONPATH /app
 #RUN python -m unittest discover -s tests/

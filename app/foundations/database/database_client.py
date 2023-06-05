@@ -59,3 +59,17 @@ class DatabaseClient:
             raise
         finally:
             self.disconnect()
+
+    def get_last_insert_id(self) -> int:
+        try:
+            self.connect()
+            self.db_cursor.execute("SELECT LAST_INSERT_ID()")
+            last_id = self.db_cursor.fetchone()[0]
+            self.db_connection.commit()
+            return last_id
+        except mysql.connector.Error as err:
+            self.db_connection.rollback()
+            logging.error(f"Error retrieving last insert id: {err}")
+            raise
+        finally:
+            self.disconnect()
