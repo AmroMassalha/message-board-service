@@ -4,22 +4,21 @@ from flask import Flask, jsonify, request, abort
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from foundations.admin.secrer_key_generator import SecretKeyGenerator
 from user_service.logic.concrete_user_service_logic import ConcreteUserServiceLogic
 
 ROOTDIR = os.path.dirname(__file__) 
 
 class UserServiceApplication:
-    _key_generator = SecretKeyGenerator()
     BLACKLIST = set()
 
     def __init__(self):
         self.app = Flask(__name__)
-        self.app.config['JWT_SECRET_KEY'] = self._key_generator.generate_key()
+        self.user_service_logic = ConcreteUserServiceLogic(ROOTDIR)
+        self.jwt = JWTManager(self.app)
+        self.app.config['JWT_SECRET_KEY'] = self.user_service_logic.secret_key
+        self.app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
         self.app.config['JWT_BLACKLIST_ENABLED'] = True
         self.app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
-        self.jwt = JWTManager(self.app)
-        self.user_service_logic = ConcreteUserServiceLogic(ROOTDIR)
 
         self.app.add_url_rule('/ping', 'ping', self.ping, methods=['GET'])
         self.app.add_url_rule("/users", "get_all_users", self.get_all_users, methods=["GET"])
@@ -292,7 +291,7 @@ class UserServiceApplication:
     
             user = self.user_service_logic.get_user_by_username(username)
             if user and len(user) > 0 and check_password_hash(user['password'], str(password)):
-                access_token = create_access_token(identity=username)
+                access_token = create_access_token(identity=username, expires_delta=False, additional_claims={"user_id": user['id']})
                 return jsonify(access_token=access_token), 200
             else:
                 return jsonify({"msg": "Bad username or password"}), 401

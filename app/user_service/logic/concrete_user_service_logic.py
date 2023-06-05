@@ -1,9 +1,9 @@
 import logging
 from typing import List, Tuple, Any
 
-from user_service.logic.user_service_logic import UserServiceLogic
+from user_service.logic.user_service_logic import AbstractUserService
 
-class ConcreteUserServiceLogic(UserServiceLogic):
+class ConcreteUserServiceLogic(AbstractUserService):
 
     def create_user(self, username: str, password: str) -> str:
         query = (self.query_builder

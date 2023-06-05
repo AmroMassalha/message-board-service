@@ -5,13 +5,13 @@ from foundations.database.database_client import DatabaseClient
 from foundations.config_reader.config_reader import ConfigReader
 from foundations.database.query_builder import QueryBuilder
 
-class UserServiceLogic(ABC):
+class AbstractUserService(ABC):
     def __init__(self, root_dir: str):
         self.config_reader = ConfigReader(root_dir)
         self.config = self.config_reader.get_config()
-        self.auth_srv_endpoint = self.config.get('AUTH_SERVICE', {})
         self.db_config = self.config.get('db_config', {})
-        self.database = self.db_config.pop("table")  # Specify the table name here
+        self.secret_key = self.config.get("APP_SECRET_KEY")
+        self.database = self.db_config.pop("table")
         self.db_client = DatabaseClient(self.db_config)
         self.query_builder = QueryBuilder()
 
@@ -38,3 +38,4 @@ class UserServiceLogic(ABC):
     @abstractmethod
     def get_user_by_username(self, username: str) -> List[Tuple[Any]]:
         pass
+#TODO add methods docs 
