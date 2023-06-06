@@ -9,6 +9,10 @@ class QueryBuilder:
         self._query += f"SELECT * FROM {table}"
         return self.build()
 
+    def on_duplicate_key_update(self, update_statement):
+        self._query += f"ON DUPLICATE KEY UPDATE {update_statement} "
+        return self
+
     def select_where(self, table, conditions):
         condition_str = ' AND '.join([f"{key} = '{value}'" for key, value in conditions.items()])
         self._query += f"SELECT * FROM {table} WHERE {condition_str}"

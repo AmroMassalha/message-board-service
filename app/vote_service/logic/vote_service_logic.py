@@ -16,7 +16,7 @@ class AbstractVoteService(ABC):
             raise
 
         if self.config:
-            self.vote_srv_endpoint = self.config.get('MESSAGE_SERVICE', {})
+            self.message_srv_endpoint = self.config.get('MESSAGE_SERVICE', {})
             self.secret_key = self.config.get("APP_SECRET_KEY", {})
             db_config = self.config.get('db_config', {}).copy()
             self.database = db_config.get('table')
@@ -27,5 +27,12 @@ class AbstractVoteService(ABC):
             self.query_builder = QueryBuilder()
 
     @abstractmethod
-    def vote_message(self, user_id, message_id, vote_type):
+    def vote_message(self, user_id: str, message_id: str, vote_type: str) -> None:
+        """
+        Allows a user to vote on a message
+        :param user_id: ID of the user voting
+        :param message_id: ID of the message to vote for
+        :param vote_type: Type of vote ('up' or 'down')
+        :return: None
+        """
         pass
