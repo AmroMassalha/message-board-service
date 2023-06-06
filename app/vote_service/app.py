@@ -40,23 +40,25 @@ class VoteServiceApplication:
         The request should include a user_id, a message_id and a vote_type.
         ---
         parameters:
-        - name: message_id
-          in: body
-          type: string
-          required: true
-          description: The ID of the message to vote for
-        - name: vote_type
-          in: body
-          type: string
-          required: true
-          description: The type of vote ('up' or 'down')
+            - in: body
+              name: body
+              required: true
+              schema:
+                type: object
+                properties:
+                    message_id:
+                      type: string
+                      description: The ID of the message to vote for
+                    vote_type:
+                      type: string
+                      description: The type of vote ('up' or 'down')
         responses:
-          200:
-            description: Vote recorded successfully
-          400:
-            description: Invalid request or vote type
-          500:
-            description: Internal server error
+            200:
+                description: Vote recorded successfully
+            400:
+                description: Invalid request or vote type
+            500:
+                description: Internal server error
         """
         user_id = g.get('user_id')
 
