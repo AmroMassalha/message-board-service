@@ -34,7 +34,7 @@ class ConcreteMessageService(AbstractMessageService):
                 'vote_type': vote_type
             })
             response.raise_for_status()
-            return response.json().get('vote_count', 0)
+            return response.json()
         except Exception as e:
             logging.error(f"Error while voting for message: {str(e)}")
             raise
@@ -58,3 +58,12 @@ class ConcreteMessageService(AbstractMessageService):
         except Exception as e:
             logging.error(f"Error while viewing user messages: {str(e)}")
             raise
+
+    def check_vote_service_health(self) -> bool:
+        try:
+            response = requests.get(f"{self.vote_srv_endpoint}/ping")
+            response.raise_for_status()
+            return True
+        except Exception as e:
+            logging.error(f"Error while checking vote service health: {str(e)}")
+            return False

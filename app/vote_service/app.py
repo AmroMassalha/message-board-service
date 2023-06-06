@@ -32,7 +32,6 @@ class VoteServiceApplication:
         """
         return 'pong', 200
 
-    @jwt_token_required(require_user_id=True)
     def vote_message(self):
         """
         Allow logged-in users to vote for a message
@@ -60,13 +59,13 @@ class VoteServiceApplication:
             500:
                 description: Internal server error
         """
-        user_id = g.get('user_id')
 
         data = request.json
-        if not all(key in data for key in ('message_id', 'vote_type')):
+        if not all(key in data for key in ('message_id', 'vote_type', 'user_id')):
             return jsonify({'error': 'Missing required data'}), 400
         message_id = data['message_id']
         vote_type = data['vote_type']
+        user_id = data['user_id']
 
         try:
             self.service.vote_message(user_id, message_id, vote_type)

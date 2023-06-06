@@ -26,6 +26,7 @@ services:
     depends_on:
       - user-service
       - database
+      - vote-service
     container_name: message-service
     build:
       context: .
@@ -38,14 +39,20 @@ services:
       PYTHONPATH: ${PYTHONPATH}
       ENV: ${ENV}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://localhost:5000/ping || exit 1",
+          "CMD-SHELL",
+          "curl -f http://localhost:5000/vote_service_health || exit 1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
     networks:
       local_app_network:
         aliases:
-          - http://message-board.message-service.com/
+          - message-board.message-service
 
   user-service:
     depends_on:
@@ -69,11 +76,9 @@ services:
     networks:
       local_app_network:
         aliases:
-          - http://message-board.user-service.com/
+          - message-board.user-service
 
   vote-service:
-    depends_on:
-      - message-service
     container_name: vote-service
     build:
       context: .
@@ -93,7 +98,7 @@ services:
     networks:
       local_app_network:
         aliases:
-          - http://message-board.vote-service.com/
+          - message-board.vote-service
 
 networks:
   local_app_network:
