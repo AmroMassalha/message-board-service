@@ -105,6 +105,48 @@ class MessageView(MethodView):
             logging.error(f"Error deleting message: {e}")
             return jsonify({"error": "Server error"}), 500
 
+class MessageVoteView(MethodView):
+
+    def __init__(self):
+        self.message_service_logic = ConcreteMessageService(ROOTDIR)
+
+    @jwt_token_required(require_user_id=True)
+    def post(self, message_id):
+        """
+        This endpoint allows users to vote for a message
+        ---
+        parameters:
+        - in: body
+          name: body
+          schema:
+            id: Vote
+            required:
+              - user_id
+              - vote_type
+            properties:
+              user_id:
+                type: string
+                description: The user's ID
+              vote_type:
+                type: string
+                description: The type of vote ('up' or 'down')
+        - in: path
+          name: message_id
+          type: string
+          required: true
+          description: The ID of the message to vote for
+        responses:
+          200:
+            description: Vote recorded successfully
+        """
+        data = request.json
+        try:
+            self.message_service_logic.vote_message(g.get('user_id'), message_id, data['vote_type'])
+            return jsonify({'status': 'Vote recorded successfully'}), 200
+        except Exception as e:
+            logging.error(f"Error voting for message: {e}")
+            return jsonify({"error": "Server error"}), 500
+
 class PingView(MethodView):
     def get(self):
         """
@@ -117,6 +159,26 @@ class PingView(MethodView):
         """
         return 'pong', 200
 
+class VoteServiceHealthCheckView(MethodView):
+    def __init__(self):
+        self.message_service_logic = ConcreteMessageService(ROOTDIR)
+
+    def get(self):
+        """
+        This endpoint checks the health of the vote service
+        ---
+        responses:
+          200:
+            description: Vote service is healthy
+          503:
+            description: Vote service is unhealthy
+        """
+        is_healthy = self.message_service_logic.check_vote_service_health()
+        if is_healthy:
+            return 'Vote service is healthy', 200
+        else:
+            return 'Vote service is unhealthy', 503
+
 if __name__=="__main__":
     app = Flask(__name__)
     Swagger(app)
@@ -125,10 +187,14 @@ if __name__=="__main__":
 
     message_view = MessageView.as_view('message_view')
     ping_view = PingView.as_view('ping_view')
+    message_vote_view = MessageVoteView.as_view('message_vote_view')
+    vote_service_health_check_view = VoteServiceHealthCheckView.as_view('vote_service_health_check_view')
 
     app.add_url_rule('/messages', view_func=message_view, methods=['GET', 'POST'])
     app.add_url_rule('/user/messages', view_func=message_view, methods=['GET'])
     app.add_url_rule('/messages/<message_id>', view_func=message_view, methods=['DELETE'])
+    app.add_url_rule('/messages/<message_id>/vote', view_func=message_vote_view, methods=['POST'])
     app.add_url_rule('/ping', view_func=ping_view, methods=['GET'])
+    app.add_url_rule('/vote_service_health', view_func=vote_service_health_check_view, methods=['GET'])
 
     app.run(host='0.0.0.0', port=5000, debug=True)

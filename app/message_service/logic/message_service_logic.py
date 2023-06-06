@@ -73,3 +73,12 @@ class AbstractMessageService(ABC):
         :return: List of dictionaries with details of each message posted by the user
         """
         pass
+
+    @abstractmethod
+    def check_vote_service_health(self) -> bool:
+        """
+        Checks the health of the vote service.
+
+        :return: True of the vote service healthy, False otherwise
+        """
+        pass
