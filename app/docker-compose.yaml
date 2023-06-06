@@ -71,6 +71,30 @@ services:
         aliases:
           - http://message-board.user-service.com/
 
+  vote-service:
+    depends_on:
+      - message-service
+    container_name: vote-service
+    build:
+      context: .
+      dockerfile: vote_service/Dockerfile
+    ports:
+      - 5003:5000
+    environment:
+      PYTHONDONTWRITEBYTECODE: ${PYTHONDONTWRITEBYTECODE}
+      PYTHONUNBUFFERED: ${PYTHONUNBUFFERED}
+      PYTHONPATH: ${PYTHONPATH}
+      ENV: ${ENV}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      local_app_network:
+        aliases:
+          - http://message-board.vote-service.com/
+
 networks:
   local_app_network:
     external: false
