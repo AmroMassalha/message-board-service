@@ -23,6 +23,7 @@ COPY --from=builder /app /app
 WORKDIR /app/message_service
 
 ENV PYTHONPATH /app
+
 #RUN python -m unittest discover -s tests/
 
 CMD ["python", "app.py"]

@@ -6,23 +6,24 @@ from foundations.config_reader.config_reader import ConfigReader
 from foundations.database.query_builder import QueryBuilder
 
 class AbstractMessageService(ABC):
-    _instance = None
-    database = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(AbstractMessageService, cls).__new__(cls)
-        return cls._instance
-
     def __init__(self, root_dir: str):
-        if not self.database:
-            self.config_reader = ConfigReader(root_dir)
+        self.config_reader = ConfigReader(root_dir)
+        self.config = None
+        try:
             self.config = self.config_reader.get_config()
+        except Exception as e:
+            print(f"Error while reading config: {e}")
+            raise
+
+        if self.config:
             self.vote_srv_endpoint = self.config.get('VOTE_SERVICE', {})
-            self.secret_key = self.config.get("APP_SECRET_KEY")
-            self.db_config = self.config.get('db_config', {})
-            self.database = self.db_config.pop('table')
-            self.db_client = DatabaseClient(self.db_config)
+            self.secret_key = self.config.get("APP_SECRET_KEY", {})
+            db_config = self.config.get('db_config', {}).copy()
+            self.database = db_config.get('table')
+            if not self.database:
+                raise ValueError("'table' key not found in the database configuration")
+            db_config.pop('table')
+            self.db_client = DatabaseClient(db_config)
             self.query_builder = QueryBuilder()
 
     @abstractmethod
