@@ -55,7 +55,6 @@ class MessageView(MethodView):
         """
         data = request.json
         try:
-            logging.error(f"data -> {data}")
             message_id = self.message_service_logic.create_message(data['user_id'], data['message'])
             return jsonify({'message_id': message_id}), 201
         except Exception as e:
@@ -81,6 +80,31 @@ class MessageView(MethodView):
             logging.error(f"Error getting user's messages: {e}")
             return jsonify({"error": "Server error"}), 500
 
+    @jwt_token_required(require_user_id=True)
+    def delete(self, message_id):
+        """
+        This endpoint deletes a specific message
+        ---
+        parameters:
+        - in: path
+          name: message_id
+          type: string
+          required: true
+          description: The ID of the message to delete
+        responses:
+          200:
+            description: Message deleted
+        """
+        user_id = g.get('user_id')
+        if not user_id:
+            return jsonify({"error": "Unauthorized"}), 401
+        try:
+            self.message_service_logic.delete_message(user_id, message_id)
+            return jsonify({'status': 'Message deleted'}), 200
+        except Exception as e:
+            logging.error(f"Error deleting message: {e}")
+            return jsonify({"error": "Server error"}), 500
+
 class PingView(MethodView):
     def get(self):
         """
@@ -104,6 +128,7 @@ if __name__=="__main__":
 
     app.add_url_rule('/messages', view_func=message_view, methods=['GET', 'POST'])
     app.add_url_rule('/user/messages', view_func=message_view, methods=['GET'])
+    app.add_url_rule('/messages/<message_id>', view_func=message_view, methods=['DELETE'])
     app.add_url_rule('/ping', view_func=ping_view, methods=['GET'])
 
     app.run(host='0.0.0.0', port=5000, debug=True)
