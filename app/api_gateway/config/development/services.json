@@ -1,0 +1,4 @@
+{
+  "MESSAGE_SERVICE": "http://message-board.message-service:5000",
+  "USER_SERVICE": "http://message-board.user-service:5000"
+}

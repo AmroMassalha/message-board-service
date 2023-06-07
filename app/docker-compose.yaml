@@ -100,6 +100,31 @@ services:
         aliases:
           - message-board.vote-service
 
+  api-gateway:
+    depends_on:
+      - user-service
+      - message-service
+    container_name: message-board-app
+    build:
+      context: .
+      dockerfile: api_gateway/Dockerfile
+    ports:
+      - 5004:5000
+    environment:
+      PYTHONDONTWRITEBYTECODE: ${PYTHONDONTWRITEBYTECODE}
+      PYTHONUNBUFFERED: ${PYTHONUNBUFFERED}
+      PYTHONPATH: ${PYTHONPATH}
+      ENV: ${ENV}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      local_app_network:
+        aliases:
+          - message-board.app
+
 networks:
   local_app_network:
     external: false
