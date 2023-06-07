@@ -170,12 +170,15 @@ echo "========================"
 echo ""
 pip install -r ./requirements.txt
 
-# Install pre-commit
+# Change the directory up, Install pre-commit and then change back
+pushd ..
 echo "============================"
 echo "Installing pre-commit hooks."
 echo "============================"
 echo ""
+source ./app/venv/bin/activate
 pre-commit install
+popd
 
 # Build and run docker compose
 echo "======================="
