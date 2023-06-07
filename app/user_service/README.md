@@ -1,27 +1,34 @@
-UserServiceApplication
-Scope
+# User Service Flask Application
+This application is a User Service written in Python, using the Flask framework. It manages users in the system, providing a variety of endpoints to create, edit, retrieve, delete, register, login and logout users.
 
-The UserServiceApplication is a service responsible for handling all user-related functionalities of the application. It includes features like:
+This service uses a concrete implementation of user service logic, `ConcreteUserServiceLogic`, to handle the business logic of user management.
 
-- Registering a new user and hashing their password.
-- Login and Logout functionality using JWT tokens.
-- User CRUD operations.
-- The 'register' feature does not create a new user if they do not exist in the system, instead, it updates the password of the existing user.
-  The UserServiceApplication does not handle functionalities like:
+The application uses JWT (JSON Web Tokens) for authentication. The `JWTManager` class handles the generation and verification of JWTs, which are used to authenticate user requests.
 
-- Authenticating or authorizing other parts of the system.
-- Handling other business functionalities that are not user-related.
+Endpoints are defined in the `UserServiceApplication` class, and the Flask application is configured with the JWT secret key and options such as token expiration and blacklist checking.
 
-High-Level Design
-The service is developed in Flask and incorporates the Model-View-Controller pattern. It uses JWT for user authentication. The data received from the client is processed in the controller layer (Flask routes), and the business logic is handled by the service layer (user_service_logic).
+The `UserServiceApplication` also includes a `/ping` endpoint for health checking purposes.
 
-We've utilized the Factory and Abstract Factory design patterns to make our UserServiceApplication more flexible and easily maintainable:
+A detailed overview of the endpoints is provided in the following table.
 
-Factory Design Pattern: In our service, we create an instance of ConcreteUserServiceLogic. This serves as our 'factory' for creating user service logic. This approach abstracts the complexities involved in the creation of the object and provides a simple interface for creation. This provides us the flexibility to easily replace or change our user service logic implementation without changing the classes that use it.
+## API Endpoints
 
-Abstract Factory Design Pattern: The ConcreteUserServiceLogic can be seen as an abstract factory, with methods to create a range of related objects (like create_user, edit_user, etc). This design allows for high-level abstraction of how these objects are created, used, and interact with each other.
+| Route     | Method   | Description                | Parameters                |
+| :-------- | :------- | :------------------------- | :------------------------ |
+| `/ping`   | `GET` | Healthcheck for the service |  None                   |
+| `/users`  | `GET` | Get a list of all users |  None                   |
+| `/users/<int:user_id>` | `GET` | Get specific user details |  user_id: int                   |
+| `/users` | `POST` | Create a new user	 |  	Body: _{username: string, password: string}_                   |
+| `/users/<int:user_id>` | `PUT` | Edit specific user details |  user_id: int, Body: _{username: string, password: string}_                   |
+| `/users/<int:user_id>` | `DELETE` | Delete a specific user |  user_id: int                   |
+| `/register` | `POST` | Register a new user	 |  Body: _{username: string, password: string}_                   |
+| `/login` | `POST` | Login for a user |  Body: _{username: string, password: string}_                   |
+| `/logout` | `POST` | Logout a user |  Header: _{Authorization: Bearer <token>}_                   |
 
-Abstract and Factory Design Patterns
-Abstract Design Pattern provides a way to encapsulate a group of individual factories that have a common theme without specifying their concrete classes. In our case, the theme is operations related to users.
+For routes that accept a body in the request, the body needs to be JSON-encoded. Additionally, for routes that accept user_id, the `user_id` should be replaced with a valid integer user ID.
 
-Factory Design Pattern is a creational pattern that provides an interface for creating objects in a superclass but allows subclasses to alter the type of objects that will be created. This pattern helps to create a loosely coupled system by separating the object creation and object usage parts. In our system, we have ConcreteUserServiceLogic as a factory for creating user service logic.
+For the `/logout` route, the `Authorization` header is required, with a valid Bearer token obtained from a successful login or register request.
+
+This application demonstrates a clean architecture for a user management service. Its design separates concerns, abstracts business logic, and provides a clear, RESTful API for client applications.
+
+Please refer to the code and the individual API endpoint comments for a more detailed understanding of the service.

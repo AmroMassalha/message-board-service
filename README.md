@@ -31,6 +31,12 @@ Please refer to individual service documentation for more detailed architecture 
 4. `Docker Compose`: For defining and running multi-container Docker applications
 Note: If these prerequisites are not met, the setup script will attempt to install the necessary dependencies. Please ensure you have a stable internet connection for this process.
 
+**Clone the repository: Clone the Message Board application repository to your local machine.**
+```bash
+https://github.com/AmroMassalha/message-board-service.git
+```
+
+
 #### Further Setup
 Please navigate to the `./app` directory and refer to the README file present for more detailed information about the application's structure and how to interact with it.
 
