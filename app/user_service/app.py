@@ -37,12 +37,12 @@ class UserServiceApplication:
 
     def ping(self):
         """
-        Just ping the server
-        This endpoint does nothing
+        just ping the server
+        this endpoint does nothing
         ---
         responses:
             200:
-                description: Server responded with a pong
+                description: server responded with a pong
         """
         return 'pong', 200
 
