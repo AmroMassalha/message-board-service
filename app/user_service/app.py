@@ -6,7 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from user_service.logic.concrete_user_service_logic import ConcreteUserServiceLogic
 
-ROOTDIR = os.path.dirname(__file__) 
+ROOTDIR = os.path.dirname(__file__)
+
 
 class UserServiceApplication:
     BLACKLIST = set()
@@ -15,24 +16,34 @@ class UserServiceApplication:
         self.app = Flask(__name__)
         self.user_service_logic = ConcreteUserServiceLogic(ROOTDIR)
         self.jwt = JWTManager(self.app)
-        self.app.config['JWT_SECRET_KEY'] = self.user_service_logic.secret_key
-        self.app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
-        self.app.config['JWT_BLACKLIST_ENABLED'] = True
-        self.app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+        self.app.config["JWT_SECRET_KEY"] = self.user_service_logic.secret_key
+        self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False
+        self.app.config["JWT_BLACKLIST_ENABLED"] = True
+        self.app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access", "refresh"]
 
-        self.app.add_url_rule('/ping', 'ping', self.ping, methods=['GET'])
-        self.app.add_url_rule("/users", "get_all_users", self.get_all_users, methods=["GET"])
-        self.app.add_url_rule("/users/<int:user_id>", "get_user", self.get_user, methods=["GET"])
-        self.app.add_url_rule("/users", "create_user", self.create_user, methods=["POST"])
-        self.app.add_url_rule("/users/<int:user_id>", "edit_user", self.edit_user, methods=["PUT"])
-        self.app.add_url_rule("/users/<int:user_id>", "delete_user", self.delete_user, methods=["DELETE"])
-        self.app.add_url_rule('/register', 'register', self.register, methods=['POST'])
-        self.app.add_url_rule('/login', 'login', self.login, methods=['POST'])
-        self.app.add_url_rule('/logout', 'logout', self.logout, methods=['POST'])
+        self.app.add_url_rule("/ping", "ping", self.ping, methods=["GET"])
+        self.app.add_url_rule(
+            "/users", "get_all_users", self.get_all_users, methods=["GET"]
+        )
+        self.app.add_url_rule(
+            "/users/<int:user_id>", "get_user", self.get_user, methods=["GET"]
+        )
+        self.app.add_url_rule(
+            "/users", "create_user", self.create_user, methods=["POST"]
+        )
+        self.app.add_url_rule(
+            "/users/<int:user_id>", "edit_user", self.edit_user, methods=["PUT"]
+        )
+        self.app.add_url_rule(
+            "/users/<int:user_id>", "delete_user", self.delete_user, methods=["DELETE"]
+        )
+        self.app.add_url_rule("/register", "register", self.register, methods=["POST"])
+        self.app.add_url_rule("/login", "login", self.login, methods=["POST"])
+        self.app.add_url_rule("/logout", "logout", self.logout, methods=["POST"])
 
         self.swagger = Swagger(self.app)
 
-    def run(self, host='0.0.0.0', port=5000):
+    def run(self, host="0.0.0.0", port=5000):
         self.app.run(host=host, port=port, debug=True)
 
     def ping(self):
@@ -44,7 +55,7 @@ class UserServiceApplication:
             200:
                 description: server responded with a pong
         """
-        return 'pong', 200
+        return "pong", 200
 
     def get_all_users(self):
         """
@@ -119,10 +130,13 @@ class UserServiceApplication:
                 description: Error occurred while creating user
         """
         data = request.get_json()
-        if not data or 'username' not in data or 'password' not in data:
-            return jsonify({"error": "Invalid request, username and password required"}), 400
+        if not data or "username" not in data or "password" not in data:
+            return (
+                jsonify({"error": "Invalid request, username and password required"}),
+                400,
+            )
         try:
-            self.user_service_logic.create_user(data['username'], data['password'])
+            self.user_service_logic.create_user(data["username"], data["password"])
             return jsonify({"message": "User created successfully"}), 201
         except Exception as e:
             logging.error(f"Error creating user: {e}")
@@ -161,10 +175,15 @@ class UserServiceApplication:
                 description: Error occurred while updating user
         """
         data = request.get_json()
-        if not data or 'username' not in data or 'password' not in data:
-            return jsonify({"error": "Invalid request, username and password required"}), 400
+        if not data or "username" not in data or "password" not in data:
+            return (
+                jsonify({"error": "Invalid request, username and password required"}),
+                400,
+            )
         try:
-            self.user_service_logic.edit_user(user_id, data['username'], data['password'])
+            self.user_service_logic.edit_user(
+                user_id, data["username"], data["password"]
+            )
             return jsonify({"message": "User updated successfully"}), 200
         except Exception as e:
             logging.error(f"Error updating user: {e}")
@@ -225,23 +244,23 @@ class UserServiceApplication:
         try:
             if not request.is_json:
                 return jsonify({"msg": "Missing JSON in request"}), 400
-    
-            username = request.json.get('username', None)
-            password = request.json.get('password', None)
-    
+
+            username = request.json.get("username", None)
+            password = request.json.get("password", None)
+
             if not username:
                 return jsonify({"msg": "Missing username parameter"}), 400
             if not password:
                 return jsonify({"msg": "Missing password parameter"}), 400
-    
+
             user = self.user_service_logic.get_user_by_username(username)
             if not user:
                 return jsonify({"msg": "User not found"}), 404
-    
-            hashed_password = generate_password_hash(str(password), method='sha256')
-    
-            self.user_service_logic.edit_user(user['id'], username, hashed_password)
-            #TODO: the register requist will replace the unhashed password with the hashed one which mean need to fix the update so can stor both formats in the same user set
+
+            hashed_password = generate_password_hash(str(password), method="sha256")
+
+            self.user_service_logic.edit_user(user["id"], username, hashed_password)
+            # TODO: the register requist will replace the unhashed password with the hashed one which mean need to fix the update so can stor both formats in the same user set
             return jsonify({"msg": "User registered successfully"}), 200
         except Exception as e:
             logging.error(f"Error registering user: {e}")
@@ -280,18 +299,26 @@ class UserServiceApplication:
         try:
             if not request.is_json:
                 return jsonify({"msg": "Missing JSON in request"}), 400
-    
-            username = request.json.get('username', None)
-            password = request.json.get('password', None)
-    
+
+            username = request.json.get("username", None)
+            password = request.json.get("password", None)
+
             if not username:
                 return jsonify({"msg": "Missing username parameter"}), 400
             if not password:
                 return jsonify({"msg": "Missing password parameter"}), 400
-    
+
             user = self.user_service_logic.get_user_by_username(username)
-            if user and len(user) > 0 and check_password_hash(user['password'], str(password)):
-                access_token = create_access_token(identity=username, expires_delta=False, additional_claims={"user_id": user['id']})
+            if (
+                user
+                and len(user) > 0
+                and check_password_hash(user["password"], str(password))
+            ):
+                access_token = create_access_token(
+                    identity=username,
+                    expires_delta=False,
+                    additional_claims={"user_id": user["id"]},
+                )
                 return jsonify(access_token=access_token), 200
             else:
                 return jsonify({"msg": "Bad username or password"}), 401

@@ -6,15 +6,25 @@ from api_gateway.logic.concrete_api_gateway_service import ConcreteApiGatewaySer
 
 ROOTDIR = os.path.dirname(__file__)
 
-class ApiGatewayApplication:
 
+class ApiGatewayApplication:
     def __init__(self):
         self.app = Flask(__name__)
         self.service = ConcreteApiGatewayService(ROOTDIR)
 
-        self.app.add_url_rule('/ping', 'ping', self.ping, methods=['GET'])
-        self.app.add_url_rule('/users/<path:path>', 'user_service', self.user_service, methods=['GET', 'POST', 'PUT', 'DELETE'])
-        self.app.add_url_rule('/messages/<path:path>', 'message_service', self.message_service, methods=['GET', 'POST', 'PUT', 'DELETE'])
+        self.app.add_url_rule("/ping", "ping", self.ping, methods=["GET"])
+        self.app.add_url_rule(
+            "/users/<path:path>",
+            "user_service",
+            self.user_service,
+            methods=["GET", "POST", "PUT", "DELETE"],
+        )
+        self.app.add_url_rule(
+            "/messages/<path:path>",
+            "message_service",
+            self.message_service,
+            methods=["GET", "POST", "PUT", "DELETE"],
+        )
 
         @self.app.errorhandler(400)
         def bad_request(error):
@@ -30,10 +40,9 @@ class ApiGatewayApplication:
 
         self.swagger = Swagger(self.app)
 
-    def run(self, host='0.0.0.0', port=5000):
+    def run(self, host="0.0.0.0", port=5000):
         self.app.run(host=host, port=port, debug=True)
-    
-    
+
     def ping(self):
         """
         just ping the server
@@ -43,7 +52,7 @@ class ApiGatewayApplication:
             200:
                 description: server responded with a pong
         """
-        return 'pong', 200
+        return "pong", 200
 
     def user_service(self, path):
         """
@@ -89,26 +98,27 @@ class ApiGatewayApplication:
         """
         return self.send_request(self.service.MESSAGE_SERVICE, path)
 
-
     def send_request(self, service_url, path):
         url = f"{service_url}/{path}"
 
         response = requests.request(
             method=request.method,
             url=url,
-            headers={key: value for (key, value) in request.headers if key != 'Host'},
+            headers={key: value for (key, value) in request.headers if key != "Host"},
             data=request.get_data(),
             cookies=request.cookies,
-            allow_redirects=False
+            allow_redirects=False,
         )
 
         response_data = ""
         if response.content:
-            response_data = response.content.decode('utf-8')
+            response_data = response.content.decode("utf-8")
 
         headers = [(name, value) for (name, value) in response.raw.headers.items()]
 
-        response = self.app.response_class(response=response_data, status=response.status_code, headers=dict(headers))
+        response = self.app.response_class(
+            response=response_data, status=response.status_code, headers=dict(headers)
+        )
         return response
 
 
