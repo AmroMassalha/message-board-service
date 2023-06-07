@@ -24,6 +24,6 @@ WORKDIR /app/message_service
 
 ENV PYTHONPATH /app
 
-#RUN python -m unittest discover -s tests/
+RUN python -m unittest discover -s tests/ -p *_test.py
 
 CMD ["python", "app.py"]
