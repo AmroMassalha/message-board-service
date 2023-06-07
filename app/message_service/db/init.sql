@@ -7,3 +7,15 @@ CREATE TABLE IF NOT EXISTS messages(
     votes INT DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+DELIMITER //
+
+CREATE TRIGGER after_message_insert
+AFTER INSERT
+ON messages FOR EACH ROW
+BEGIN
+   INSERT INTO vote(user_id, message_id, vote_type) VALUES (NEW.user_id, NEW.message_id, 'up');
+END;
+//
+
+DELIMITER ;

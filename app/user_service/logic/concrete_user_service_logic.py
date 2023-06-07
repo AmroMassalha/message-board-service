@@ -10,8 +10,8 @@ from user_service.logic.user_service_logic import AbstractUserService
 
 class ConcreteUserServiceLogic(AbstractUserService):
     def create_user(self, username: str, password: str) -> str:
-        query = self.query_builder.insert_into(self.database, "username, password", "%s, %s").build()
         args = (username, password)
+        query = self.query_builder.insert_into(self.database, "username, password", args).build()
         try:
             self.db_client.execute_query(self.database, query, *args)
             return "User created successfully"

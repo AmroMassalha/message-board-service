@@ -30,12 +30,14 @@ class AbstractVoteService(ABC):
             self.query_builder = QueryBuilder()
 
     @abstractmethod
-    def vote_message(self, user_id: str, message_id: str, vote_type: str) -> None:
+    def update_vote(self, user_id: str, message_id: str, vote_type: str) -> None:
         """
-        Allows a user to vote on a message
+        Allows a user to change their vote on a message.
+        If the vote doesn't exist yet, it will not be created.
+
         :param user_id: ID of the user voting
-        :param message_id: ID of the message to vote for
+        :param message_id: ID of the message to change vote for
         :param vote_type: Type of vote ('up' or 'down')
-        :return: None
+        :return: True if vote updated, False otherwise
         """
         pass

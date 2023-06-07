@@ -14,7 +14,7 @@ class ConcreteMessageService(AbstractMessageService):
         query = self.query_builder.insert(self.database, {"user_id": user_id, "message": message})
         try:
             self.db_client.execute_query(self.database, query)
-            return str(self.db_client.get_last_insert_id())
+            return str(self.db_client.db_cursor.lastrowid)
         except Exception as e:
             logging.error(f"Error while creating message: {str(e)}")
             raise
@@ -29,7 +29,7 @@ class ConcreteMessageService(AbstractMessageService):
 
     def vote_message(self, user_id: str, message_id: str, vote_type: str) -> int:
         try:
-            response = requests.post(
+            response = requests.put(
                 f"{self.vote_srv_endpoint}/vote",
                 json={
                     "user_id": user_id,

@@ -46,6 +46,7 @@ class DatabaseClient:
         try:
             self.connect()
             full_query = query.format(table_name)
+            logging.warning(full_query)
             if len(args) == 1 and isinstance(args[0], (list, tuple)):
                 self.db_cursor.execute(full_query, args[0])
             else:

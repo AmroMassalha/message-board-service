@@ -35,7 +35,7 @@ class MessageView(MethodView):
             logging.error(f"Error getting message: {e}")
             return jsonify({"error": "Server error"}), 500
 
-    @jwt_token_required()
+    @jwt_token_required(require_user_id=True)
     def post(self):
         """
         This endpoint posts a new message
@@ -46,12 +46,8 @@ class MessageView(MethodView):
           schema:
             id: UserMessage
             required:
-              - user_id
               - message
             properties:
-              user_id:
-                type: string
-                description: The user's ID
               message:
                 type: string
                 description: The message text
@@ -61,7 +57,7 @@ class MessageView(MethodView):
         """
         data = request.json
         try:
-            message_id = self.message_service_logic.create_message(data["user_id"], data["message"])
+            message_id = self.message_service_logic.create_message(g.get("user_id"), data["message"])
             return jsonify({"message_id": message_id}), 201
         except Exception as e:
             logging.error(f"Error posting message: {e}")
@@ -117,7 +113,7 @@ class MessageVoteView(MethodView):
         self.message_service_logic = ConcreteMessageService(ROOTDIR)
 
     @jwt_token_required(require_user_id=True)
-    def post(self, message_id):
+    def put(self, message_id):
         """
         This endpoint allows users to vote for a message
         ---
@@ -127,12 +123,8 @@ class MessageVoteView(MethodView):
           schema:
             id: Vote
             required:
-              - user_id
               - vote_type
             properties:
-              user_id:
-                type: string
-                description: The user's ID
               vote_type:
                 type: string
                 description: The type of vote ('up' or 'down')
@@ -202,12 +194,12 @@ if __name__ == "__main__":
     app.add_url_rule("/messages", view_func=message_view, methods=["GET", "POST"])
     app.add_url_rule("/user/messages", view_func=message_view, methods=["GET"])
     app.add_url_rule("/messages/<message_id>", view_func=message_view, methods=["DELETE"])
-    app.add_url_rule("/messages/<message_id>/vote", view_func=message_vote_view, methods=["POST"])
+    app.add_url_rule("/messages/<message_id>/vote", view_func=message_vote_view, methods=["PUT"])
     app.add_url_rule("/ping", view_func=ping_view, methods=["GET"])
     app.add_url_rule(
         "/vote_service_health",
         view_func=vote_service_health_check_view,
-        methods=["GET"],
+        methods=["get"],
     )
 
     app.run(host="0.0.0.0", port=5000, debug=True)

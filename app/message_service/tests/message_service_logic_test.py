@@ -44,7 +44,6 @@ class TestConcreteMessageService(unittest.TestCase):
     def test_create_message(self, mock_db_client, mock_query_builder):
         mock_query_builder.insert.return_value = "mock_query"
         mock_db_client.execute_query.return_value = None
-        mock_db_client.get_last_insert_id.return_value = 1
 
         result = self.message_service.create_message("user_id", "message")
 
