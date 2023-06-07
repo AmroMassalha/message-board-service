@@ -1,9 +1,13 @@
-import logging, os
-from flask import Flask, request, jsonify, g
-from flasgger import Swagger
+from __future__ import annotations
 
+import logging
+import os
+
+from flasgger import Swagger
+from flask import Flask
+from flask import jsonify
+from flask import request
 from vote_service.logic.concrete_vote_service import ConcreteVoteService
-from foundations.admin.token.get_user_id_from_token import jwt_token_required
 
 ROOTDIR = os.path.dirname(__file__)
 
@@ -14,9 +18,7 @@ class VoteServiceApplication:
         self.service = ConcreteVoteService(ROOTDIR)
 
         self.app.add_url_rule("/ping", "ping", self.ping, methods=["GET"])
-        self.app.add_url_rule(
-            "/vote", "vote_message", self.vote_message, methods=["POST"]
-        )
+        self.app.add_url_rule("/vote", "vote_message", self.vote_message, methods=["POST"])
 
         self.swagger = Swagger(self.app)
 

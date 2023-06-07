@@ -1,10 +1,16 @@
-import logging
-from typing import List, Tuple, Any
-from abc import ABC, abstractmethod
+from __future__ import annotations
 
-from foundations.database.database_client import DatabaseClient
+import logging
+from abc import ABC
+from abc import abstractmethod
+from typing import Any
+from typing import List
+from typing import Tuple
+
 from foundations.config_reader.config_reader import ConfigReader
+from foundations.database.database_client import DatabaseClient
 from foundations.database.query_builder import QueryBuilder
+
 
 class AbstractUserService(ABC):
     def __init__(self, root_dir: str):
@@ -18,11 +24,11 @@ class AbstractUserService(ABC):
 
         if self.config:
             self.secret_key = self.config.get("APP_SECRET_KEY")
-            db_config = self.config.get('db_config', {}).copy()
+            db_config = self.config.get("db_config", {}).copy()
             self.database = db_config.get("table")
             if not self.database:
                 raise ValueError("'table' key not found in the database configuration")
-            db_config.pop('table')
+            db_config.pop("table")
             self.db_client = DatabaseClient(db_config)
             self.query_builder = QueryBuilder()
 

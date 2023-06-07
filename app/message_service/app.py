@@ -1,10 +1,16 @@
-import logging, os
-from flask import Flask, request, jsonify, g
-from flask.views import MethodView
-from flasgger import Swagger
+from __future__ import annotations
 
-from message_service.logic.concrete_message_service import ConcreteMessageService
+import logging
+import os
+
+from flasgger import Swagger
+from flask import Flask
+from flask import g
+from flask import jsonify
+from flask import request
+from flask.views import MethodView
 from foundations.admin.token.get_user_id_from_token import jwt_token_required
+from message_service.logic.concrete_message_service import ConcreteMessageService
 
 ROOTDIR = os.path.dirname(__file__)
 
@@ -55,9 +61,7 @@ class MessageView(MethodView):
         """
         data = request.json
         try:
-            message_id = self.message_service_logic.create_message(
-                data["user_id"], data["message"]
-            )
+            message_id = self.message_service_logic.create_message(data["user_id"], data["message"])
             return jsonify({"message_id": message_id}), 201
         except Exception as e:
             logging.error(f"Error posting message: {e}")
@@ -143,9 +147,7 @@ class MessageVoteView(MethodView):
         """
         data = request.json
         try:
-            self.message_service_logic.vote_message(
-                g.get("user_id"), message_id, data["vote_type"]
-            )
+            self.message_service_logic.vote_message(g.get("user_id"), message_id, data["vote_type"])
             return jsonify({"status": "Vote recorded successfully"}), 200
         except Exception as e:
             logging.error(f"Error voting for message: {e}")
@@ -195,18 +197,12 @@ if __name__ == "__main__":
     message_view = MessageView.as_view("message_view")
     ping_view = PingView.as_view("ping_view")
     message_vote_view = MessageVoteView.as_view("message_vote_view")
-    vote_service_health_check_view = VoteServiceHealthCheckView.as_view(
-        "vote_service_health_check_view"
-    )
+    vote_service_health_check_view = VoteServiceHealthCheckView.as_view("vote_service_health_check_view")
 
     app.add_url_rule("/messages", view_func=message_view, methods=["GET", "POST"])
     app.add_url_rule("/user/messages", view_func=message_view, methods=["GET"])
-    app.add_url_rule(
-        "/messages/<message_id>", view_func=message_view, methods=["DELETE"]
-    )
-    app.add_url_rule(
-        "/messages/<message_id>/vote", view_func=message_vote_view, methods=["POST"]
-    )
+    app.add_url_rule("/messages/<message_id>", view_func=message_view, methods=["DELETE"])
+    app.add_url_rule("/messages/<message_id>/vote", view_func=message_vote_view, methods=["POST"])
     app.add_url_rule("/ping", view_func=ping_view, methods=["GET"])
     app.add_url_rule(
         "/vote_service_health",

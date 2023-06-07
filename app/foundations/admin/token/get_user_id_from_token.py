@@ -1,7 +1,14 @@
+from __future__ import annotations
+
 import logging
 from functools import wraps
-from flask import request, g, jsonify, current_app
-from jwt import decode, InvalidTokenError
+
+from flask import current_app
+from flask import g
+from flask import jsonify
+from flask import request
+from jwt import decode
+from jwt import InvalidTokenError
 
 
 def jwt_token_required(require_user_id=False):

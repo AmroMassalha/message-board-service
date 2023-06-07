@@ -1,8 +1,13 @@
-import os, requests
-from flasgger import Swagger
-from flask import Flask, jsonify, request, abort
+from __future__ import annotations
 
+import os
+
+import requests
 from api_gateway.logic.concrete_api_gateway_service import ConcreteApiGatewayService
+from flasgger import Swagger
+from flask import Flask
+from flask import jsonify
+from flask import request
 
 ROOTDIR = os.path.dirname(__file__)
 
@@ -116,9 +121,7 @@ class ApiGatewayApplication:
 
         headers = [(name, value) for (name, value) in response.raw.headers.items()]
 
-        response = self.app.response_class(
-            response=response_data, status=response.status_code, headers=dict(headers)
-        )
+        response = self.app.response_class(response=response_data, status=response.status_code, headers=dict(headers))
         return response
 
 

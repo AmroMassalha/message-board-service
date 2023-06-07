@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class QueryBuilder:
     def __init__(self):
         self.reset()
@@ -14,18 +17,18 @@ class QueryBuilder:
         return self
 
     def select_where(self, table, conditions):
-        condition_str = ' AND '.join([f"{key} = '{value}'" for key, value in conditions.items()])
+        condition_str = " AND ".join([f"{key} = '{value}'" for key, value in conditions.items()])
         self._query += f"SELECT * FROM {table} WHERE {condition_str}"
         return self.build()
 
     def insert(self, table, data):
-        columns = ', '.join(data.keys())
-        values = ', '.join([f"'{value}'" for value in data.values()])
+        columns = ", ".join(data.keys())
+        values = ", ".join([f"'{value}'" for value in data.values()])
         self._query += f"INSERT INTO {table} ({columns}) VALUES ({values})"
         return self.build()
 
     def delete(self, table, conditions):
-        condition_str = ' AND '.join([f"{key} = '{value}'" for key, value in conditions.items()])
+        condition_str = " AND ".join([f"{key} = '{value}'" for key, value in conditions.items()])
         self._query += f"DELETE FROM {table} WHERE {condition_str}"
         return self.build()
 

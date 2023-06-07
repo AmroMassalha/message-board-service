@@ -1,9 +1,15 @@
-from typing import List, Dict, Any
-from abc import ABC, abstractmethod
+from __future__ import annotations
 
-from foundations.database.database_client import DatabaseClient
+from abc import ABC
+from abc import abstractmethod
+from typing import Any
+from typing import Dict
+from typing import List
+
 from foundations.config_reader.config_reader import ConfigReader
+from foundations.database.database_client import DatabaseClient
 from foundations.database.query_builder import QueryBuilder
+
 
 class AbstractMessageService(ABC):
     def __init__(self, root_dir: str):
@@ -16,13 +22,13 @@ class AbstractMessageService(ABC):
             raise
 
         if self.config:
-            self.vote_srv_endpoint = self.config.get('VOTE_SERVICE', {})
+            self.vote_srv_endpoint = self.config.get("VOTE_SERVICE", {})
             self.secret_key = self.config.get("APP_SECRET_KEY", {})
-            db_config = self.config.get('db_config', {}).copy()
-            self.database = db_config.get('table')
+            db_config = self.config.get("db_config", {}).copy()
+            self.database = db_config.get("table")
             if not self.database:
                 raise ValueError("'table' key not found in the database configuration")
-            db_config.pop('table')
+            db_config.pop("table")
             self.db_client = DatabaseClient(db_config)
             self.query_builder = QueryBuilder()
 

@@ -1,9 +1,14 @@
-import mysql.connector
+from __future__ import annotations
+
 import logging
-from typing import List, Tuple, Any
+from typing import Any
+from typing import List
+from typing import Tuple
+
+import mysql.connector
+
 
 class DatabaseClient:
-
     def __init__(self, db_config: dict):
         self.db_config = db_config
         self.db_connection = None
@@ -44,7 +49,7 @@ class DatabaseClient:
             self.db_cursor.execute(full_query, args)
 
             # If the operation is not a SELECT operation, commit and return None
-            if 'SELECT' not in full_query.upper():
+            if "SELECT" not in full_query.upper():
                 self.db_connection.commit()
                 return
 

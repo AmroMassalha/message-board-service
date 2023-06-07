@@ -1,7 +1,10 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
+
 import logging
+from abc import ABC
 
 from foundations.config_reader.config_reader import ConfigReader
+
 
 class AbstractApiGateway(ABC):
     def __init__(self, root_dir: str):

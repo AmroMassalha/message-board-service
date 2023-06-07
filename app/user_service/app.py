@@ -1,10 +1,20 @@
-import logging, os
-from flasgger import Swagger
-from flask import Flask, jsonify, request, abort
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt, jwt_required
-from werkzeug.security import generate_password_hash, check_password_hash
+from __future__ import annotations
 
+import logging
+import os
+
+from flasgger import Swagger
+from flask import abort
+from flask import Flask
+from flask import jsonify
+from flask import request
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
 from user_service.logic.concrete_user_service_logic import ConcreteUserServiceLogic
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 ROOTDIR = os.path.dirname(__file__)
 
@@ -22,21 +32,11 @@ class UserServiceApplication:
         self.app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access", "refresh"]
 
         self.app.add_url_rule("/ping", "ping", self.ping, methods=["GET"])
-        self.app.add_url_rule(
-            "/users", "get_all_users", self.get_all_users, methods=["GET"]
-        )
-        self.app.add_url_rule(
-            "/users/<int:user_id>", "get_user", self.get_user, methods=["GET"]
-        )
-        self.app.add_url_rule(
-            "/users", "create_user", self.create_user, methods=["POST"]
-        )
-        self.app.add_url_rule(
-            "/users/<int:user_id>", "edit_user", self.edit_user, methods=["PUT"]
-        )
-        self.app.add_url_rule(
-            "/users/<int:user_id>", "delete_user", self.delete_user, methods=["DELETE"]
-        )
+        self.app.add_url_rule("/users", "get_all_users", self.get_all_users, methods=["GET"])
+        self.app.add_url_rule("/users/<int:user_id>", "get_user", self.get_user, methods=["GET"])
+        self.app.add_url_rule("/users", "create_user", self.create_user, methods=["POST"])
+        self.app.add_url_rule("/users/<int:user_id>", "edit_user", self.edit_user, methods=["PUT"])
+        self.app.add_url_rule("/users/<int:user_id>", "delete_user", self.delete_user, methods=["DELETE"])
         self.app.add_url_rule("/register", "register", self.register, methods=["POST"])
         self.app.add_url_rule("/login", "login", self.login, methods=["POST"])
         self.app.add_url_rule("/logout", "logout", self.logout, methods=["POST"])
@@ -181,9 +181,7 @@ class UserServiceApplication:
                 400,
             )
         try:
-            self.user_service_logic.edit_user(
-                user_id, data["username"], data["password"]
-            )
+            self.user_service_logic.edit_user(user_id, data["username"], data["password"])
             return jsonify({"message": "User updated successfully"}), 200
         except Exception as e:
             logging.error(f"Error updating user: {e}")
@@ -260,7 +258,10 @@ class UserServiceApplication:
             hashed_password = generate_password_hash(str(password), method="sha256")
 
             self.user_service_logic.edit_user(user["id"], username, hashed_password)
-            # TODO: the register requist will replace the unhashed password with the hashed one which mean need to fix the update so can stor both formats in the same user set
+            """
+            # TODO: the register requist will replace the unhashed password with the hashed one which
+                mean need to fix the update so can stor both formats in the same user set
+            """
             return jsonify({"msg": "User registered successfully"}), 200
         except Exception as e:
             logging.error(f"Error registering user: {e}")
@@ -309,11 +310,7 @@ class UserServiceApplication:
                 return jsonify({"msg": "Missing password parameter"}), 400
 
             user = self.user_service_logic.get_user_by_username(username)
-            if (
-                user
-                and len(user) > 0
-                and check_password_hash(user["password"], str(password))
-            ):
+            if user and len(user) > 0 and check_password_hash(user["password"], str(password)):
                 access_token = create_access_token(
                     identity=username,
                     expires_delta=False,
