@@ -11,7 +11,7 @@ class ConcreteVoteService(AbstractVoteService):
             vote_data = (user_id, message_id, vote_type)
             query = (
                 self.query_builder.insert_into(self.database, "user_id, message_id, vote_type", vote_data)
-                .on_duplicate_key_update("vote_type = VALUES(vote_type)")
+                .on_duplicate_key_update({"user_id": "", "message_id": "", "vote_type": ""})
                 .build()
             )
             try:
