@@ -13,7 +13,8 @@ class QueryBuilder:
         return self.build()
 
     def on_duplicate_key_update(self, update_statement):
-        self._query += f"ON DUPLICATE KEY UPDATE {update_statement} "
+        update_stmt = ", ".join([f"{col}=VALUES({col})" for col in update_statement.keys()])
+        self._query += f"ON DUPLICATE KEY UPDATE {update_stmt} "
         return self
 
     def select_where(self, table, conditions):
@@ -41,7 +42,9 @@ class QueryBuilder:
         return self
 
     def insert_into(self, table, columns, values):
-        self._query += f"INSERT INTO {table} ({columns}) VALUES ({values}) "
+        cols = ", ".join(columns.split(", "))
+        placeholder = ", ".join(["%s"] * len(values))
+        self._query += f"INSERT INTO {table} ({cols}) VALUES ({placeholder}) "
         return self
 
     def update(self, table):
