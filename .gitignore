@@ -1,1 +1,22 @@
+# App Project
 .vscode/
+
+# Terraform Project
+**/.terraform/*
+
+*.tfstate
+*tfstate.*
+
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+.terraform.lock.hcl
+
+.terraformrc
+terraform.rc
+
+tfplan
+
+# Helm Project

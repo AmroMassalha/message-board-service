@@ -1,0 +1,29 @@
+ingress:
+  enabled: false
+  className: alb
+  path: /
+  # Used to create an Ingress record.
+  hosts:
+    - ci-docker-pullcache.ops.minutesvc.com
+  annotations:
+    alb.ingress.kubernetes.io/group.name: automation-lb
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/load-balancer-name: ci-jenkins
+    alb.ingress.kubernetes.io/group.order: "10"
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+persistence:
+  enabled: false
+  size: 50Gi
+  storageClass: gp3
+proxy:
+  enabled: true
+  remoteurl: https://registry-1.docker.io
+  secretRef: dockerhub-creds # asaf: manually created for now
