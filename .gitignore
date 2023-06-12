@@ -19,4 +19,6 @@ terraform.rc
 
 tfplan
 
+terraform.tfvars
+
 # Helm Project
