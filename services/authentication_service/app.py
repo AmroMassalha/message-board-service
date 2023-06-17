@@ -12,10 +12,9 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
+from user_service.logic.concrete_user_service_logic import ConcreteUserServiceLogic
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
-
-from user_service.logic.concrete_user_service_logic import ConcreteUserServiceLogic
 
 ROOTDIR = os.path.dirname(__file__)
 

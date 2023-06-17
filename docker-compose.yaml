@@ -4,7 +4,7 @@ services:
     container_name: database
     build:
       context: .
-      dockerfile: db.Dockerfile
+      dockerfile: database/Dockerfile
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -31,7 +31,7 @@ services:
     container_name: message-service
     build:
       context: .
-      dockerfile: message_service/Dockerfile
+      dockerfile: services/message_service/Dockerfile
     ports:
       - 5002:5000
     environment:
@@ -62,7 +62,7 @@ services:
     container_name: user-service
     build:
       context: .
-      dockerfile: user_service/Dockerfile
+      dockerfile: services/user_service/Dockerfile
     ports:
       - 5001:5000
     environment:
@@ -85,7 +85,7 @@ services:
     container_name: vote-service
     build:
       context: .
-      dockerfile: vote_service/Dockerfile
+      dockerfile: services/vote_service/Dockerfile
     ports:
       - 5003:5000
     environment:
@@ -111,7 +111,7 @@ services:
     container_name: message-board-app
     build:
       context: .
-      dockerfile: api_gateway/Dockerfile
+      dockerfile: services/api_gateway/Dockerfile
     ports:
       - 5004:5000
     environment:
@@ -134,7 +134,7 @@ services:
     container_name: site-app
     build:
       context: .
-      dockerfile: site/Dockerfile
+      dockerfile: services/site/Dockerfile
     ports:
       - 8080:80
     restart: always

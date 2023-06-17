@@ -6,7 +6,7 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY ../site/ .
+COPY ../../services/site/ .
 
 RUN npm run build
 
