@@ -4,23 +4,23 @@ FROM python:3.11.3-slim AS base
 WORKDIR /app
 
 # Install dependencies
-COPY ../requirements.txt .
+COPY ../../requirements.txt .
 RUN apt-get update && apt-get install -y curl
 RUN pip install -r requirements.txt
 
-COPY ../foundations/ ./foundations/
+COPY ../../foundations/ ./foundations/
 
 # Stage 2: Build stage
 FROM base AS builder
 
-COPY ../message_service/ ./message_service/
+COPY ../../services/api_gateway/ ./api_gateway/
 
 # Stage 3: Final image
 FROM base
 
 COPY --from=builder /app /app
 
-WORKDIR /app/message_service
+WORKDIR /app/api_gateway
 
 ENV PYTHONPATH /app
 

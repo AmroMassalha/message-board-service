@@ -176,7 +176,7 @@ echo "============================"
 echo "Installing pre-commit hooks."
 echo "============================"
 echo ""
-source ./app/venv/bin/activate
+source ./venv/bin/activate
 pre-commit install
 popd
 
