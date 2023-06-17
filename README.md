@@ -1,44 +1,66 @@
+# Message Board Application - Microservices Architecture
 
-# Message Board Microservices
+Welcome to the microservices architecture of the Message Board Application. This guide will give you an overview of the structure of each microservice, configuration management, database initialization, containerization, the foundation directory, and the setup process.
 
-### Overview
-The Message Board Microservices project consists of multiple decoupled services including User Service, Message Service, Vote Service, and API Gateway. Each service is dedicated to a specific functionality offering granular control and simplifying the overall management of the message board.
+## Microservice Structure
+Each microservice in the Message Board Application is built on the following architecture:
 
-The main motivation behind this project is to provide a simplified way for clients to manage messages, including creating, voting, updating, and deleting them, all while ensuring a high level of security.
+* ***Abstract Python Class***: Each microservice begins with an abstract base class. This class provides a set of interfaces that are intended to be fully implemented in the concrete class.
 
-By leveraging the power of microservices architecture, each component can be developed, deployed, and scaled independently. This provides great flexibility and helps in faster feature releases, easier maintenance, and efficient scaling based on individual service load.
-### Architecture
-The project follows the microservices architectural style. It is composed of:
+* ***Concrete Python Class***: The concrete class inherits from the abstract base class and provides implementations for the interfaces defined in the abstract class.
 
-1. ***User Service***: Manages all operations related to users. It provides functionality for user registration, authentication, and profile management. Each user is associated with a unique identifier which is used across other services. The service also ensures the security of user data by implementing appropriate encryption techniques and secure access policies. This service communicates with others using its API and uses MySQL as its database system.
+* ***Flask App***: On top of the concrete class, we have the Flask app itself which handles all the routing and server-side logic of the microservice.
 
-2. ***Message Service***: Handles message-related operations. Each message is associated with a user identifier and a unique message identifier. This service supports operations like posting a new message, updating an existing message, and deleting a message. All messages are timestamped, and access to modify or delete messages is controlled based on the user. The Message Service communicates with the User and Vote services through their APIs and uses MySQL for its database needs.
+    ### Configuration Management
+    Each microservice contains a config directory which includes different `JSON` files for configuration. These JSON files provide an easy and     flat flow for managing different configurations for each service.
 
-3. ***Vote Service***: Manages voting operations for the messages. It allows users to upvote or downvote messages. Each vote is associated with a user identifier and a message identifier, ensuring that a user can vote only once for a specific message. The service also provides functionality to fetch the current vote count for a message. This service communicates with the Message Service using its API and uses MySQL for data persistence.
+    ### Database Initialization
+    Each microservice contains an `init.sql` script file. These scripts describe the structure of the database table(s) specific to each microservice.
 
-4. ***API Gateway***: Serves as the single entry point for all clients. It routes requests to the appropriate microservices and aggregates the responses. The gateway also implements rate limiting and access control policies to protect the services from abusive access patterns. It performs protocol translation, request routing, load balancing, and can provide API analytics and logging.
+    ### Containerization
+    Each microservice includes a `Dockerfile` that enables it to be containerized. This allows each microservice to be deployed and run in a consistent environment.
 
-All these services communicate with each other using synchronous HTTP/REST protocols. They each have their own MySQL databases to ensure loose coupling and service independence.
+    In addition to the microservice-specific Dockerfiles, the main directory includes a `MySQL` Dockerfile that copies `init.sql` scripts from each microservice.
 
-The architecture is designed to be resilient, distributed, and scalable. We use containerization (with Docker) and orchestration tools (like Kubernetes) to deploy and manage the microservices.
+## Docker Compose
+The main directory contains a Docker Compose file. This file includes the definitions of all services making up the Message Board Application, allowing them to be built, started, and stopped together.
 
-Please refer to individual service documentation for more detailed architecture and design choices.
+## Foundation Directory
+The foundation directory is an essential component of the application. It contains the following:
 
-### Prerequisites
-1. Operating System: Linux or MacOS
-2. `Python`: Version 3.10 or higher
-3. `Docker`: For containerizing the application
-4. `Docker Compose`: For defining and running multi-container Docker applications
-Note: If these prerequisites are not met, the setup script will attempt to install the necessary dependencies. Please ensure you have a stable internet connection for this process.
+* ***Singletons***: These are classes that restrict the instantiation of a class to a single instance, ensuring that a class has only one instance, and provides a global point of access to it.
+* ***Token Management***: This component handles token creation and validation. It's vital for maintaining secure user sessions and API authorization.
+* ***Database Client***: This is a custom wrapper around our database interactions. It provides a unified interface for the various microservices to interact with the database.
+* ***Configuration Reader***: This utility reads and validates configuration files for the microservices.
 
-**Clone the repository: Clone the Message Board application repository to your local machine.**
+## Python Requirements
+The `requirements.txt` file in the main directory lists all Python packages required by the application.
+
+## Setup Script
+The `setup.sh` script in the main directory prepares the local machine to run the application using Docker.
+
+# Setup Steps
+1. **Clone the repository**: Clone the Message Board application repository to your local machine.
+
+2. **Run setup.sh**: Navigate to the cloned repository and run the setup script. This script is designed to detect your operating system and install the necessary dependencies.
 ```bash
-https://github.com/AmroMassalha/message-board-service.git
+./setup.sh
 ```
+The script will perform the _following tasks_:
+
+* Verify Python version: Checks if Python 3.10 or higher is installed. If not, it will offer to install it.
+* Install Docker: If Docker is not installed, it will offer to install it.
+* Install Docker Compose: If Docker Compose is not installed, it will offer to install it.
+* Create and activate a virtual environment: The script will set up a Python virtual environment for the application and activate it.
+* Install requirements: The script will install the required Python packages listed in the requirements.txt file.
+* Install pre-commit hooks: The script will install the pre-commit hooks for the application.
+* Build and run Docker Compose: Finally, the script will use Docker Compose to build and run the application.
 
 
-#### Further Setup
-Please navigate to the `./app` directory and refer to the README file present for more detailed information about the application's structure and how to interact with it.
+--------------------------------------------------------------------------------------
 
 
-As for the `./terraform` and `./helm` directories, please note that their respective documentations are currently TBD (To Be Determined). Check back later for updates.
+We invite you to explore, use, and contribute to this project. Don't hesitate to reach out if you encounter any issues or have suggestions.
+
+# Support
+Our supportive and energetic team is always on standby to assist you. Reach out to us via email at amr.massalha@gmail.com, or join our vibrant Slack channel. Your journey with our Message Board Application is as much our journey, and we are committed to making it a successful and enjoyable one.

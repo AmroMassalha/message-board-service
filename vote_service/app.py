@@ -7,6 +7,7 @@ from flasgger import Swagger
 from flask import Flask
 from flask import jsonify
 from flask import request
+
 from vote_service.logic.concrete_vote_service import ConcreteVoteService
 
 ROOTDIR = os.path.dirname(__file__)

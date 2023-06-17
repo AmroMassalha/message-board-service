@@ -16,6 +16,7 @@ services:
       local_app_network:
         aliases:
           - database
+    restart: always
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 30s
@@ -38,6 +39,7 @@ services:
       PYTHONUNBUFFERED: ${PYTHONUNBUFFERED}
       PYTHONPATH: ${PYTHONPATH}
       ENV: ${ENV}
+    restart: always
     healthcheck:
       test:
         [
@@ -68,6 +70,7 @@ services:
       PYTHONUNBUFFERED: ${PYTHONUNBUFFERED}
       PYTHONPATH: ${PYTHONPATH}
       ENV: ${ENV}
+    restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
       interval: 30s
@@ -90,6 +93,7 @@ services:
       PYTHONUNBUFFERED: ${PYTHONUNBUFFERED}
       PYTHONPATH: ${PYTHONPATH}
       ENV: ${ENV}
+    restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
       interval: 30s
@@ -115,6 +119,7 @@ services:
       PYTHONUNBUFFERED: ${PYTHONUNBUFFERED}
       PYTHONPATH: ${PYTHONPATH}
       ENV: ${ENV}
+    restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
       interval: 30s
@@ -124,6 +129,25 @@ services:
       local_app_network:
         aliases:
           - message-board.app
+
+  site:
+    container_name: site-app
+    build:
+      context: .
+      dockerfile: site/Dockerfile
+    ports:
+      - 8080:80
+    restart: always
+    healthcheck:
+      test: ["CMD", 'curl', "-f", "http://localhost:80"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      local_app_network:
+        aliases:
+          - message-board.site
 
 networks:
   local_app_network:

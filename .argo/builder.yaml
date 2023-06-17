@@ -1,0 +1,72 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: build-
+spec:
+  entrypoint: build-push
+  serviceAccountName: argo-workflow
+  arguments:
+    parameters:
+    - name: services
+      value: |
+        [
+          "user_service",
+          "message_service",
+          "vote_service",
+          "api_gateway"
+        ]
+  templates:
+  - name: build-push
+    steps:
+    - - name: checkout-code
+        template: git-clone
+    - - name: build-all-services
+        template: build-service
+        arguments:
+          parameters:
+          - name: service
+            value: "{{item}}"
+        withParam: "{{workflow.parameters.services}}"
+  - name: git-clone
+    outputs:
+      artifacts:
+      - name: source
+        path: "/app"
+    container:
+      image: alpine/git
+      command: ["sh", "-c"]
+      args: ["git clone https://github.com/AmroMassalha/message-board-service /app"]
+  - name: build-service
+    inputs:
+      parameters:
+      - name: service
+    steps:
+    - - name: generate-tag
+        template: generate-tag
+    - - name: docker-build
+        template: docker-build
+        arguments:
+          parameters:
+          - name: service
+            value: "{{inputs.parameters.service}}"
+          - name: tag
+            value: "{{steps.generate-tag.outputs.parameters.tag}}"
+  - name: generate-tag
+    outputs:
+      parameters:
+      - name: tag
+        valueFrom:
+          path: /tmp/tag.txt
+    container:
+      image: alpine:3.7
+      command: ["sh", "-c"]
+      args: ["date +%s | tee /tmp/tag.txt"]
+  - name: docker-build
+    inputs:
+      parameters:
+      - name: service
+      - name: tag
+    container:
+      image: docker
+      command: ["sh", "-c"]
+      args: ["docker build -t docker-pull-cache-docker-registry.docker-registry.svc.cluster.local:5000/${inputs.parameters.service}:${inputs.parameters.tag} /app/${inputs.parameters.service} && docker push localhost:30280/${inputs.parameters.service}:${inputs.parameters.tag}"]

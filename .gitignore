@@ -1,24 +1,5 @@
-# App Project
-.vscode/
+venv/
 
-# Terraform Project
-**/.terraform/*
-
-*.tfstate
-*tfstate.*
-
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-
-.terraform.lock.hcl
-
-.terraformrc
-terraform.rc
-
-tfplan
-
-terraform.tfvars
-
-# Helm Project
+**/_pycache__/
+*.py[cod]
+*$py.class

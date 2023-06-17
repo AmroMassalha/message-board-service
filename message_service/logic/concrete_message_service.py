@@ -6,6 +6,7 @@ from typing import List
 from typing import Tuple
 
 import requests
+
 from message_service.logic.message_service_logic import AbstractMessageService
 
 

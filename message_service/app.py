@@ -9,6 +9,7 @@ from flask import g
 from flask import jsonify
 from flask import request
 from flask.views import MethodView
+
 from foundations.admin.token.get_user_id_from_token import jwt_token_required
 from message_service.logic.concrete_message_service import ConcreteMessageService
 
