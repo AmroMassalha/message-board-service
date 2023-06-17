@@ -1,3 +1,5 @@
 #!/bin/bash
 
-jq -s '.[0] * .[1]'\
+jq -s 'reduce .[] as $item ({}; if $item then . * $item else . end)' \
+  /services/user_service/rabbitmq/definitions.json \
+  > /etc/rabbitmq/definitions.json
