@@ -52,7 +52,7 @@ class ConcreteAuthServiceLogic(AbstractAuthService):
             logging.exception(f"Failed to retrieve user {username} from auth data: {e}")
             return f"Failed to login. Could not retrieve user data for {username}. {e}"
 
-        if user_data and check_password_hash(auth_data[0][3], user_data[0][1]):
+        if user_data and user_data[0][1] == password and check_password_hash(auth_data[0][3], password):
             payload = {
                 "username": username,
                 "user_id": user_data[0][0],
