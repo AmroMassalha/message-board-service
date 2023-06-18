@@ -3,16 +3,13 @@ from __future__ import annotations
 import logging
 from abc import ABC
 from abc import abstractmethod
-from typing import Any
-from typing import List
-from typing import Tuple
 
 from foundations.config_reader.config_reader import ConfigReader
 from foundations.database.database_client import DatabaseClient
 from foundations.database.query_builder import QueryBuilder
 
 
-class AbstractUserService(ABC):
+class AbstractAuthService(ABC):
     def __init__(self, root_dir: str):
         self.config_reader = ConfigReader(root_dir)
         self.config = None
@@ -24,6 +21,7 @@ class AbstractUserService(ABC):
 
         if self.config:
             self.secret_key = self.config.get("APP_SECRET_KEY")
+            self.USER_SERVICE = self.config.get("USER_SERVICE", None)
             db_config = self.config.get("db_config", {}).copy()
             self.database = db_config.get("table")
             if not self.database:
@@ -33,7 +31,7 @@ class AbstractUserService(ABC):
             self.query_builder = QueryBuilder()
 
     @abstractmethod
-    def create_user(self, username: str, password: str) -> str:
+    def register(self, username: str, password: str) -> bool:
         """
         Creates a new user
         :param username: The username of the user to create
@@ -43,7 +41,7 @@ class AbstractUserService(ABC):
         pass
 
     @abstractmethod
-    def edit_user(self, user_id: int, username: str, password: str) -> str:
+    def login(self, username: str, password: str) -> str:
         """
         Edits an existing user
         :param user_id: The ID of the user to edit
@@ -54,36 +52,10 @@ class AbstractUserService(ABC):
         pass
 
     @abstractmethod
-    def delete_user(self, user_id: int) -> str:
+    def logout(self, jti: str) -> str:
         """
         Deletes an existing user
         :param user_id: The ID of the user to delete
         :return: Success message
-        """
-        pass
-
-    @abstractmethod
-    def get_user(self, user_id: int) -> List[Tuple[Any]]:
-        """
-        Retrieves a user by ID
-        :param user_id: The ID of the user to retrieve
-        :return: A list of tuples representing the user data
-        """
-        pass
-
-    @abstractmethod
-    def get_all_user(self) -> List[Tuple[Any]]:
-        """
-        Retrieves all users
-        :return: A list of tuples each representing a user data
-        """
-        pass
-
-    @abstractmethod
-    def get_user_by_username(self, username: str) -> List[Tuple[Any]]:
-        """
-        Retrieves a user by username
-        :param username: The username of the user to retrieve
-        :return: A list of tuples representing the user data
         """
         pass

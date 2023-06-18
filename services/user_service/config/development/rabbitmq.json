@@ -1,0 +1,9 @@
+{
+  "rabbitmq": {
+    "user": "guser",
+    "password": "gpass",
+    "host": "rabbitmq",
+    "port": "5672",
+    "queue_name": "users"
+  }
+}

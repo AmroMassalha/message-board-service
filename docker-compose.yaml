@@ -17,6 +17,10 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    networks:
+      local_app_network:
+        aliases:
+          - rabbitmq
 
   database:
     container_name: database
@@ -34,7 +38,6 @@ services:
       local_app_network:
         aliases:
           - database
-    restart: always
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 30s
@@ -73,6 +76,31 @@ services:
       local_app_network:
         aliases:
           - message-board.message-service
+
+  auth-service:
+    depends_on:
+      - user-service
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: services/authentication_service/Dockerfile
+    ports:
+      - 5005:5000
+    environment:
+      PYTHONDONTWRITEBYTECODE: ${PYTHONDONTWRITEBYTECODE}
+      PYTHONUNBUFFERED: ${PYTHONUNBUFFERED}
+      PYTHONPATH: ${PYTHONPATH}
+      ENV: ${ENV}
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      local_app_network:
+        aliases:
+          - message-board.auth-service
 
   user-service:
     depends_on:
