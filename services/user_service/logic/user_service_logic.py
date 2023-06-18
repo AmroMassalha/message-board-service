@@ -10,6 +10,7 @@ from typing import Tuple
 from foundations.config_reader.config_reader import ConfigReader
 from foundations.database.database_client import DatabaseClient
 from foundations.database.query_builder import QueryBuilder
+from foundations.rabbitmq.rabbitmq_manager import RabbitMQManager
 
 
 class AbstractUserService(ABC):
@@ -24,6 +25,7 @@ class AbstractUserService(ABC):
 
         if self.config:
             self.secret_key = self.config.get("APP_SECRET_KEY")
+            mq_config = self.config.get("rabbitmq", {}).copy()
             db_config = self.config.get("db_config", {}).copy()
             self.database = db_config.get("table")
             if not self.database:
@@ -31,6 +33,8 @@ class AbstractUserService(ABC):
             db_config.pop("table")
             self.db_client = DatabaseClient(db_config)
             self.query_builder = QueryBuilder()
+            self.rabbitmq_manager = RabbitMQManager(mq_config)
+            self.rabbitmq_manager.create_queue()
 
     @abstractmethod
     def create_user(self, username: str, password: str) -> str:

@@ -47,10 +47,13 @@ class DatabaseClient:
             self.connect()
             full_query = query.format(table_name)
             logging.warning(full_query)
-            if len(args) == 1 and isinstance(args[0], (list, tuple)):
-                self.db_cursor.execute(full_query, args[0])
-            else:
-                self.db_cursor.execute(full_query, args)
+            try:
+                if len(args) == 1 and isinstance(args[0], (list, tuple)):
+                    self.db_cursor.execute(full_query, args[0])
+                else:
+                    self.db_cursor.execute(full_query, args)
+            except Exception as e:
+                logging.error(f"Failed to execute query {full_query}: {e}")
 
             # If the operation is not a SELECT operation, commit and return None
             if "SELECT" not in full_query.upper():
