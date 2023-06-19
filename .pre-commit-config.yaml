@@ -26,3 +26,11 @@ repos:
     - id: black
       language_version: python3.10
       args: [--line-length=120]
+-   repo: local
+    hooks:
+    - id: check-for-pem
+      name: Check for PEM files
+      description: This hook checks if there are any PEM files staged for commit.
+      entry: ./check_for_pem.sh
+      language: script
+      types: [file]
